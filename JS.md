@@ -262,5 +262,78 @@ Output:
 ```
 [1, 2, 3, 4]
 ```
+---
+
+## ✅ 8. Promise.all() vs Promise.race() vs Promise.any() ⚡
+
+👉 **Promise.all()** - Resolves when **ALL promises are resolved** or fails if any one fails.
+👉 **Promise.race()** - Resolves as soon as **any one promise resolves**.
+👉 **Promise.any()** - Resolves as soon as **any one promise fulfills (ignores rejection)**.
+
+👉 **Example:**
+
+```js
+Promise.any([
+  fetch(url1),
+  fetch(url2),
+  fetch(url3)
+]).then(res => console.log(res));
+```
+
+---
+
+## ✅ 9. Call, Apply, Bind 💡
+
+👉 **Call:** Calls the function with a specified `this` value.
+👉 **Apply:** Same as call but takes arguments as an array.
+👉 **Bind:** Returns a new function with specified `this` value.
+
+👉 **Example:**
+
+```js
+function greet(city) {
+  console.log(`${this.name} from ${city}`);
+}
+
+let person = { name: 'Sanket' };
+greet.call(person, 'Pune');
+greet.apply(person, ['Mumbai']);
+let newGreet = greet.bind(person, 'Delhi');
+newGreet();
+```
+
+---
+
+## ✅ 10. Debouncing vs Throttling 🚀
+
+👉 **Debouncing:** Delay function execution until user stops input.
+👉 **Throttling:** Limits function execution within a specific time interval.
+
+👉 **Example (Debounce):**
+
+```js
+function debounce(func, delay) {
+  let timer;
+  return function() {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, arguments), delay);
+  };
+}
+```
+
+👉 **Example (Throttle):**
+
+```js
+function throttle(func, limit) {
+  let lastCall = 0;
+  return function() {
+    let now = Date.now();
+    if (now - lastCall >= limit) {
+      lastCall = now;
+      func.apply(this, arguments);
+    }
+  };
+}
+```
 
 ---
