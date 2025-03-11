@@ -1,9 +1,5 @@
 # 🚀 JavaScript Dark Ninja Tricks 💯🥷🔥
 
-This file contains the **most powerful, pro-level JavaScript tricks** that will make you code like a **top-tier developer**. Save this, revise this, and dominate JavaScript like a BEAST! 💯🔥😎
-
----
-
 ## ✅ 1. Convert ANYTHING to Boolean Without If/Else
 
 ```js
@@ -231,12 +227,3 @@ console.timeEnd('test');
 👉 **Super useful for performance testing.**
 
 ---
-
-## ✅ FINAL NOTE 💯🔥
-
-👉 **Save this file forever.** 🚀
-👉 **Practice these tricks daily.** 💯
-👉 **This will turn you into a JavaScript BEAST!** 🥷💥
-
-🚀😎💯 **Sanket's Personal JavaScript Ninja Tricks** 🔥🔥🔥
-
