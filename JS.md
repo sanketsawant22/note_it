@@ -264,7 +264,7 @@ Output:
 ```
 ---
 
-## ✅ 8. Promise.all() vs Promise.race() vs Promise.any() ⚡
+## ✅ 13. Promise.all() vs Promise.race() vs Promise.any() ⚡
 
 👉 **Promise.all()** - Resolves when **ALL promises are resolved** or fails if any one fails.
 👉 **Promise.race()** - Resolves as soon as **any one promise resolves**.
@@ -282,7 +282,7 @@ Promise.any([
 
 ---
 
-## ✅ 9. Call, Apply, Bind 💡
+## ✅ 14. Call, Apply, Bind 💡
 
 👉 **Call:** Calls the function with a specified `this` value.
 👉 **Apply:** Same as call but takes arguments as an array.
@@ -304,7 +304,7 @@ newGreet();
 
 ---
 
-## ✅ 10. Debouncing vs Throttling 🚀
+## ✅ 15. Debouncing vs Throttling 🚀
 
 👉 **Debouncing:** Delay function execution until user stops input.
 👉 **Throttling:** Limits function execution within a specific time interval.
