@@ -88,4 +88,7 @@
    - **final variable** → Value cannot be changed (constant).
    - **final method** → Cannot be overridden.
    - **final class** → Cannot be inherited.
-
+---
+## 💡 **Real-World Analogy:**
+   - **Class** = A real working machine.
+   - **Interface** = A manual that says “any machine that follows these rules is good to go.”
