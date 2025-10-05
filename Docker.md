@@ -1,6 +1,7 @@
 # 🐳 Docker Notes
 
-These notes summarize key Docker concepts and commands, from running containers to using Docker Compose.
+These notes summarize key Docker concepts and commands, from running containers to using Docker Compose.  
+Includes advanced topics like **networking**, **volumes**, **layer optimization**, and **multi-stage builds**.
 
 ---
 
@@ -13,6 +14,15 @@ docker run -it ubuntu
 - `docker run` → Runs a new container from an image  
 - `-it` → Runs the container in **interactive** mode with a terminal attached  
 - `ubuntu` → Name of the image to run
+
+---
+
+### Run a Named Container
+```bash
+docker run -it --name my-container ubuntu
+```
+- Runs the container and names it `my-container`.  
+- You can refer to the container by name instead of its auto-generated ID.
 
 ---
 
@@ -75,70 +85,153 @@ Environment variables are often used for configuration (e.g., database credentia
 
 ---
 
-## 🔹 Containerizing a Node.js Application
+## 🔹 Docker Networking
 
-### 1. Create a `Dockerfile` in your app’s root directory  
-*(Same folder where your `server.js` or main entry file exists)*
+Docker provides different **network drivers** for containers to communicate.
+
+### List and Inspect Networks
+```bash
+docker network ls
+```
+Lists all available networks.
+
+```bash
+docker network inspect bridge
+```
+Displays details of the default `bridge` network — including connected containers and configuration.
+
+---
+
+### Network Modes
+
+#### 🧩 Bridge (Default)
+- Default network mode for containers.
+- Each container gets its own **private IP** within a virtual bridge network.  
+- Containers can access the internet through the host.  
+- Requires **port mapping** to expose container ports to the host.
 
 Example:
-```dockerfile
-# Use an official Node.js base image
-FROM node:18
-
-# Set working directory inside container
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy source code
-COPY . .
-
-# Expose the port your app runs on
-EXPOSE 8000
-
-# Command to run the application
-ENTRYPOINT ["node", "main.js"]
-```
-
----
-
-### 2. Build the Docker Image
 ```bash
-docker build -t <image_name> .
+docker run -it --network=bridge ubuntu
 ```
-- `-t` → Tags the image with a name  
-- `.` → Path to the Dockerfile (current directory)
 
----
+#### 🌐 Host
+- The container shares the **same network as the host machine**.  
+- No port mapping is required — container and host use the same IP.
 
-### 3. Run the Container
+Example:
 ```bash
-docker run -it -p 6000:8000 <image_name>
+docker run -it --network=host ubuntu
 ```
-Runs your Node.js app inside a container and maps ports for local access.
+
+#### 🚫 None
+- The container has **no network access** (completely isolated).
+
+Example:
+```bash
+docker run -it --network=none ubuntu
+```
 
 ---
 
-## 🔹 Layer Caching
+### Creating a Custom Network
+```bash
+docker network create -d bridge my-network
+```
+- Creates a new custom network using the `bridge` driver.
+
+Now, if you run multiple containers on this custom network:
+```bash
+docker run -it --network=my-network --name container1 ubuntu
+docker run -it --network=my-network --name container2 ubuntu
+```
+They can communicate with each other using container names:
+```bash
+ping container2
+```
+
+---
+
+## 🔹 Volume Mounting (Data Persistence)
+
+By default, containers are **ephemeral** — once deleted, their data is lost.  
+To persist data, Docker provides **volumes**.
+
+### Example: Mount a Volume
+```bash
+docker run -it -v /Users/sanket/Desktop/test:/home/abc --name sanket ubuntu
+```
+- Mounts a local folder (`/Users/sanket/Desktop/test`) to a folder inside the container (`/home/abc`).  
+- Any changes in this directory are **synchronized** both ways.  
+- Data persists even after the container is removed.
+
+💡 **Use Case:** Database containers like MySQL or PostgreSQL often use volumes to persist data between restarts.
+
+---
+
+## 🔹 Layer Caching and Build Optimization
 
 Docker builds images in **layers**.  
-Each command (like `FROM`, `COPY`, `RUN`, etc.) creates a separate layer.
+Each command in the `Dockerfile` creates a new layer.
 
-- When rebuilding, **unchanged layers are cached**, speeding up the build.  
-- Only the layers **after the modified instruction** are rebuilt.
+### Example (Inefficient Build Order)
+```dockerfile
+FROM ubuntu
+RUN apt-get install -y nodejs
+COPY main.js .
+RUN npm install
+ENTRYPOINT ["node", "main.js"]
+```
+If you change `main.js`, Docker will re-run **`npm install` unnecessarily**.
 
-🧠 **Tip:**  
-Order your Dockerfile intelligently — put commands that change less frequently (like `npm install`) near the top, and the ones that change frequently (like copying source code) near the bottom.
+### Optimized Order (Efficient Caching)
+```dockerfile
+FROM ubuntu
+RUN apt-get install -y nodejs
+COPY package*.json ./
+RUN npm install
+COPY . .
+ENTRYPOINT ["node", "main.js"]
+```
+By copying `package.json` before the main code, Docker can reuse cached layers for faster rebuilds.
+
+🧠 **Tip:** Order Dockerfile instructions from least to most frequently changed.
+
+---
+
+## 🔹 Multi-Stage Builds
+
+Used to optimize builds (especially for compiled languages like TypeScript, Go, Java).  
+This approach separates **build** and **runtime** stages to reduce image size.
+
+### Example: Node.js + TypeScript App
+```dockerfile
+# Stage 1: Build the app
+FROM node:18 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build  # compiles TS to JS
+
+# Stage 2: Run the app
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+RUN npm install --omit=dev
+EXPOSE 8000
+ENTRYPOINT ["node", "dist/main.js"]
+```
+✅ Smaller final image  
+✅ Faster deployment  
+✅ Cleaner separation between development and runtime
 
 ---
 
 ## 🔹 Docker Compose
 
-Docker Compose helps manage **multiple containers** (like backend + database + cache) easily using a single YAML file.
+Docker Compose helps manage **multiple containers** (like backend + database + cache) using a single YAML file.
 
 ### Example: `docker-compose.yml`
 ```yaml
@@ -182,15 +275,15 @@ Runs containers in **detached mode** (in the background).
 ---
 
 ### 🧩 Notes
-- All containers started by Docker Compose are grouped in a **single network** (default name: based on project folder).  
-- Containers can communicate with each other using their **service names** (e.g., `postgres`, `redis`) as hostnames.
+- All containers started by Docker Compose are grouped in a **single network**.  
+- Containers can communicate using **service names** as hostnames (e.g., `postgres`, `redis`).
 
 ---
 
 ## 🧹 Common Tips
 
 - Use `docker ps` as a shorthand for `docker container ls`.  
-- Use `docker logs <container_name>` to view container logs.  
+- Use `docker logs <container_name>` to view logs.  
 - Use `docker rm <container_name>` to remove stopped containers.  
 - Use `docker rmi <image_name>` to remove unused images.  
 - To prune unused data:
@@ -205,13 +298,17 @@ Runs containers in **detached mode** (in the background).
 | Task | Command |
 |------|----------|
 | Run container | `docker run -it <image>` |
+| Run named container | `docker run -it --name <name> <image>` |
 | List containers | `docker container ls` |
 | Execute command | `docker exec <container> <cmd>` |
 | Enter container shell | `docker exec -it <container> bash` |
 | Build image | `docker build -t <image_name> .` |
+| Create network | `docker network create -d bridge <name>` |
+| Run container on network | `docker run -it --network=<network> <image>` |
+| Mount volume | `docker run -v <host_dir>:<container_dir>` |
 | Start Compose stack | `docker compose up` |
 | Stop Compose stack | `docker compose down` |
 
 ---
 
-**🚀 With these commands and concepts, you can build, run, and manage containerized applications efficiently using Docker and Docker Compose.**
+**🚀 With these concepts and commands, you can efficiently build, network, and manage containerized applications using Docker and Docker Compose.**
