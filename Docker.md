@@ -186,12 +186,13 @@ If you change `main.js`, Docker will re-run **`npm install` unnecessarily**.
 
 ### Optimized Order (Efficient Caching)
 ```dockerfile
-FROM ubuntu
-RUN apt-get install -y nodejs
+FROM node:18-alpine
+WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --omit=dev && npm cache clean --force
 COPY . .
-ENTRYPOINT ["node", "main.js"]
+EXPOSE 8000
+CMD ["node", "main.js"]
 ```
 By copying `package.json` before the main code, Docker can reuse cached layers for faster rebuilds.
 
