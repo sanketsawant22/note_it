@@ -2670,5 +2670,469 @@ class C implements A, B {
 ```
 ---
 
+## 🔹 What is `enum` in Java?
 
+An **`enum`** is a special type used to define a **fixed set of constants**.
+
+👉 Think of it like: *“only these values are allowed, nothing else”*
+
+---
+
+## 🔹 Basic Example
+
+```java
+enum Day {
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
+}
+```
+
+Now you can use it like:
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Day today = Day.MONDAY;
+
+        System.out.println(today);
+    }
+}
+```
+
+✅ Output:
+
+```
+MONDAY
+```
+
+---
+
+## 🔹 Why use enum?
+
+Without enum:
+
+```java
+String day = "MONDAY"; // risk of typo ❌
+```
+
+With enum:
+
+```java
+Day day = Day.MONDAY; // safe ✅
+```
+
+👉 Prevents invalid values
+👉 Makes code cleaner and type-safe
+
+---
+
+## 🔹 enum with `switch`
+
+```java
+Day today = Day.FRIDAY;
+
+switch (today) {
+    case MONDAY:
+        System.out.println("Start of week");
+        break;
+    case FRIDAY:
+        System.out.println("Weekend coming!");
+        break;
+    default:
+        System.out.println("Normal day");
+}
+```
+
+---
+
+## 🔹 enum is NOT just constants (Important 🔥)
+
+Enum in Java is actually a **class** behind the scenes.
+
+You can add:
+
+### 1. Variables
+
+### 2. Constructors
+
+### 3. Methods
+
+---
+
+## 🔹 Advanced Example
+
+```java
+enum Level {
+    LOW(1),
+    MEDIUM(2),
+    HIGH(3);
+
+    private int value;
+
+    Level(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+```
+
+Usage:
+
+```java
+Level l = Level.HIGH;
+System.out.println(l.getValue()); // 3
+```
+
+---
+
+## 🔹 Built-in Methods of enum
+
+```java
+Day d = Day.MONDAY;
+
+d.name();      // "MONDAY"
+d.ordinal();   // 0 (position)
+Day.valueOf("MONDAY"); // converts string → enum
+Day.values();  // returns all constants
+```
+
+---
+
+## 🔹 Key Points (Exam + Interview 💡)
+
+* Enum = fixed set of constants
+* Type-safe alternative to `String` / `int`
+* Can have constructors, methods, variables
+* Internally extends `java.lang.Enum`
+* Cannot extend another class (already extending Enum)
+
+---
+
+## 🔹 Real-world Use Cases
+
+* Days of week
+* Status (`SUCCESS`, `FAILED`, `PENDING`)
+* Directions (`NORTH`, `SOUTH`)
+* User roles (`ADMIN`, `USER`)
+
+---
+
+## 🔹 What is an Annotation in Java?
+
+👉 Annotation = **metadata (information) about code**
+
+It tells the compiler, tools, or frameworks **how to treat that code**.
+
+✔️ It does **NOT change logic directly**
+✔️ It gives **extra instructions / hints**
+
+---
+
+## 🔹 Your Understanding (Fixed Version)
+
+You said:
+
+> “we directly talk to compiler”
+
+👉 Partly correct, but more precise is:
+
+➡️ Annotations are used by:
+
+* Compiler (e.g. `@Override`)
+* JVM (runtime processing)
+* Frameworks (like Spring)
+
+---
+
+## 🔹 Example: `@Override`
+
+```java
+class Parent {
+    void show() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+
+    @Override
+    void show() {
+        System.out.println("Child");
+    }
+}
+```
+
+👉 What `@Override` does:
+
+* Tells compiler: *“This method must override a parent method”*
+* If you make mistake → compiler error
+
+❌ Example mistake:
+
+```java
+@Override
+void sho() { } // typo → error
+```
+
+---
+
+## 🔹 Important Point (VERY IMPORTANT ⚠️)
+
+👉 Annotation does **NOT execute code**
+
+It only:
+
+* Validates
+* Marks
+* Configures behavior
+
+---
+
+## 🔹 Types of Annotations
+
+### 1. Built-in (Core Java)
+
+* `@Override`
+* `@Deprecated`
+* `@SuppressWarnings`
+
+Example:
+
+```java
+@Deprecated
+void oldMethod() {
+}
+```
+
+---
+
+### 2. Custom Annotation
+
+You can create your own:
+
+```java
+@interface MyAnnotation {
+    String value();
+}
+```
+
+---
+
+### 3. Framework Annotations (REAL POWER 💥)
+
+This is where your statement becomes **100% true** 👇
+
+> “In Spring we use annotations everywhere”
+
+YES 🔥
+
+Example (Spring Boot):
+
+```java
+@RestController
+public class MyController {
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello";
+    }
+}
+```
+
+👉 Here annotations tell Spring:
+
+* This is a controller
+* This method handles HTTP GET request
+
+---
+
+# 🔹 Functional Interface
+
+## 👉 Definition
+
+A **functional interface** is an interface that has **exactly ONE abstract method**.
+
+---
+
+## 🔹 Example
+
+```java
+@FunctionalInterface
+interface MyInterface {
+    void sayHello();
+}
+```
+
+👉 Only ONE abstract method allowed
+👉 You *can* have multiple default/static methods
+
+---
+
+## 🔹 Why `@FunctionalInterface`?
+
+It’s optional but useful:
+
+```java
+@FunctionalInterface
+interface Test {
+    void run();
+    // void stop(); ❌ compile error
+}
+```
+
+👉 Compiler ensures only one abstract method
+---
+
+# 🔹 Lambda Expression
+
+A **lambda expression** is a **short way to implement a functional interface**.
+
+---
+
+## 🔹 Normal Way (Before Java 8)
+
+```java
+MyInterface obj = new MyInterface() {
+    public void sayHello() {
+        System.out.println("Hello");
+    }
+};
+```
+
+---
+
+## 🔹 Lambda Way (Clean 🔥)
+
+```java
+MyInterface obj = () -> {
+    System.out.println("Hello");
+};
+```
+---
+---
+
+## 🔹 Errors in Java
+
+### 1. Compile-time Error
+
+* Occurs during compilation
+* Example: syntax mistakes, missing semicolon
+
+### 2. Runtime Error (Exception)
+
+* Occurs during execution
+* Example: divide by zero, null pointer
+* These are called **exceptions**
+
+### 3. Logical Error
+
+* Code runs but gives wrong output
+* Caused by wrong logic
+
+---
+
+## 🔹 Exception
+
+👉 Exception = **runtime error that disrupts normal flow of program**
+
+👉 To prevent program from stopping → we use **exception handling**
+
+---
+
+## 🔹 Try-Catch-Finally
+
+```java
+try {
+    // risky code
+} catch (Exception e) {
+    // handle exception
+} finally {
+    // always executes (whether exception occurs or not)
+}
+```
+
+---
+
+✔ `try` → code that may cause exception
+✔ `catch` → handles exception
+✔ `finally` → always runs (optional but useful)
+
+---
+
+## 🔹 `throw` keyword
+
+👉 Used to **explicitly throw an exception**
+
+```java
+throw new Exception("Something went wrong");
+```
+
+Example:
+
+```java
+if (age < 18) {
+    throw new ArithmeticException("Not eligible");
+}
+```
+
+✔ Used inside method
+✔ Throws **one exception at a time**
+
+---
+
+## 🔹 Custom Exception (own message)
+
+```java
+class MyException extends Exception {
+    MyException(String message) {
+        super(message);
+    }
+}
+```
+
+Usage:
+
+```java
+if (marks < 40) {
+    throw new MyException("Fail");
+}
+```
+
+---
+
+## 🔹 `throws` keyword
+
+👉 Used to **declare exceptions** (not throw)
+
+```java
+void test() throws Exception {
+    // code
+}
+```
+
+Example:
+
+```java
+void checkAge(int age) throws Exception {
+    if (age < 18) {
+        throw new Exception("Not allowed");
+    }
+}
+```
+
+✔ Used in method signature
+✔ Can declare **multiple exceptions**
+
+```java
+void test() throws IOException, SQLException {
+}
+```
 
